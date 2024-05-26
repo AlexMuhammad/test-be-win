@@ -27,6 +27,10 @@
     {
       "name": "Products",
       "description": "Products API"
+    },
+    {
+      "name": "Profile",
+      "description": "Profile API"
     }
   ],
   "paths": {
@@ -453,6 +457,64 @@
                 "example": {
                   "success": false,
                   "error": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "summary": "Profile",
+        "tags": ["Profile"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "data": {},
+                "message": "Success to get profile data"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful get data",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                      "id": 2,
+                      "email": "alexmuh@mail.com",
+                      "name": "tes",
+                      "gender": "female"
+                  },
+                  "message": "Success to get profile data"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not registered",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "User not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "error message"
                 }
               }
             }
