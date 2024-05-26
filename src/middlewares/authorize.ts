@@ -1,15 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-
-interface UserData {
-  id: number;
-  name: string;
-  email: string;
-}
-
-interface ValidationRequest extends Request {
-  userData: UserData;
-}
+import { UserData, ValidationRequest } from "../types";
 
 const accessValidation = async (
   req: Request,

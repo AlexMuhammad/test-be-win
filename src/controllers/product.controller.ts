@@ -1,12 +1,7 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthorizationRequest } from "../types";
 const { products } = require("../models/index");
 const cloudinary = require("../middlewares/cloudinary");
-
-interface AuthorizationRequest extends Request {
-  userData?: {
-    id: number;
-  };
-}
 
 module.exports = {
   async getListProduct(req: AuthorizationRequest, res: Response, next: NextFunction) {

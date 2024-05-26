@@ -1,16 +1,11 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthorizationRequest } from "../types";
 
 require("dotenv").config();
 const { users } = require("../models/index");
 
-interface ProfileRequest extends Request {
-  userData?: {
-    id: number;
-  };
-}
-
 module.exports = {
-  async getProfile(req: ProfileRequest, res: Response, next: NextFunction) {
+  async getProfile(req: AuthorizationRequest, res: Response, next: NextFunction) {
     try {
       const user = await users.findUnique({
         where: {
