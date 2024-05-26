@@ -1,0 +1,464 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Test Backend Widya Wicara",
+    "version": "1.0.0",
+    "description": "Technical Test"
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "/api/v1/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User Auth API"
+    },
+    {
+      "name": "Products",
+      "description": "Products API"
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "summary": "List all products and search",
+        "tags": ["Products"],
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search query string",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Products retrieved successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "status": "success",
+                  "message": "Data for all courses successfully obtained!",
+                  "data": [
+                    {
+                      "id": 2,
+                      "name": "handuk",
+                      "description": "ahh ini shampooo",
+                      "price": "12344",
+                      "image": null,
+                      "user_id": null,
+                      "createdat": "2024-05-26T09:24:35.884Z",
+                      "updatedat": "2024-05-26T09:24:35.884Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": "error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/create": {
+      "post": {
+        "summary": "Create a new product",
+        "tags": ["Products"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["name", "description", "price"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Product created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Successfully to create product",
+                  "data": {
+                    "id": 4,
+                    "name": "alex",
+                    "description": "ahhhhh",
+                    "price": "233232",
+                    "image": "http://res.cloudinary.com/dlgyb9w63/image/upload/v1716750670/products-test/oersg2sq5jihen7aiey3.png",
+                    "user_id": null,
+                    "createdat": "2024-05-26T19:11:12.866Z",
+                    "updatedat": "2024-05-26T19:11:12.866Z"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "summary": "Get details of a specific product",
+        "tags": ["Products"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the course",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Successfully to get detail product",
+                  "data": {
+                    "id": 3,
+                    "name": "alexcc",
+                    "description": "ahhhhhwww",
+                    "price": "233232",
+                    "image": "http://res.cloudinary.com/dlgyb9w63/image/upload/v1716748538/products-test/whibcn9hgqvrjydjazrx.png",
+                    "user_id": null,
+                    "createdat": "2024-05-26T18:35:38.894Z",
+                    "updatedat": "2024-05-26T18:35:38.894Z"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/update/{id}": {
+      "put": {
+        "summary": "Update product by ID",
+        "tags": ["Products"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the product to update",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "price": {
+                    "type": "string"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": ["name", "description", "price"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Product updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Successfully to update product",
+                  "data": {
+                    "id": 3,
+                    "name": "alexcc",
+                    "description": "ahhhhhwww",
+                    "price": "233232",
+                    "image": "http://res.cloudinary.com/dlgyb9w63/image/upload/v1716748538/products-test/whibcn9hgqvrjydjazrx.png",
+                    "user_id": null,
+                    "createdat": "2024-05-26T18:35:38.894Z",
+                    "updatedat": "2024-05-26T18:35:38.894Z"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/delete/{id}": {
+      "delete": {
+        "summary": "Delete a product by ID",
+        "tags": ["Products"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the course to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Course deleted successfully!",
+                  "data": {}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Product not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Product not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "name": "john_doe",
+                "email": "john.doe@example.com",
+                "password": "securepassword",
+                "gender": "maleorfemale"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 2,
+                    "name": "tes",
+                    "email": "yeslexta@mail.com",
+                    "gender": "female"
+                  },
+                  "message": "Successfully created account"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "error message"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email already exist",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "email already exist"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login",
+        "tags": ["Authentication"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "email": "john.doe@example.com",
+                "password": "securepassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "name": "ahh alex lagi s"
+                  },
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJ5ZXNsZXh0dEBtYWlsLmNvbSIsImlhdCI6MTcxNjc1MjQ5MiwiZXhwIjoxNzE2NzU2MDkyfQ.Rwd3LlGfsHHpJouN_teSJY-wx6wEGd2_cRo33njJuys"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Email not registered",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Email not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": "Internal Server Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

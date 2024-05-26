@@ -157,6 +157,17 @@ module.exports = {
         },
       });
 
+      const isProductExist = await products.findUnique({
+        where: productId,
+      });
+
+      if (!isProductExist) {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
+
       res.status(200).json({
         success: true,
         message: "Successfully to delete product",
