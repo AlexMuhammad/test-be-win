@@ -1,26 +1,15 @@
-import { PrismaClient } from "@prisma/client";
 import express from "express";
 
+const router = require("./routes");
+require("dotenv").config();
 const app = express();
 const PORT = 5000;
-const prisma = new PrismaClient();
 
 app.use(express.json());
-
-//POST
-app.post("/users", async (req, res, next) => {
-  const {name, gender, email, password} = req.body;
-  const result = await prisma.users.create({
-    data: {
-      name,
-      gender,
-      email,
-      password,
-    },
-  });
-  res.json({
-    data: result,
-    message: "Success to create user",
+app.use("/api/v1", router);
+app.get("*", (req, res) => {
+  return res.status(404).json({
+    error: "Hello👋, This Endpoint is not registered brow!",
   });
 });
 
