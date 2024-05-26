@@ -63,7 +63,7 @@ module.exports = {
       });
     } catch (error: any) {
       return res.status(500).json({
-        status: "error",
+        success: false,
         message: error.message,
       });
     }

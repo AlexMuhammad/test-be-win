@@ -1,11 +1,14 @@
 import express from "express";
-
-const router = require("./routes");
 require("dotenv").config();
+
+const bodyParser = require("body-parser");
+const router = require("./routes");
 const app = express();
 const PORT = 5000;
 
+app.use(bodyParser.json());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1", router);
 app.get("*", (req, res) => {
   return res.status(404).json({
