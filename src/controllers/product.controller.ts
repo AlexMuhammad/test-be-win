@@ -2,8 +2,14 @@ import { NextFunction, Request, Response } from "express";
 const { products } = require("../models/index");
 const cloudinary = require("../middlewares/cloudinary");
 
+interface AuthorizationRequest extends Request {
+  userData?: {
+    id: number;
+  };
+}
+
 module.exports = {
-  async getListProduct(req: Request, res: Response, next: NextFunction) {
+  async getListProduct(req: AuthorizationRequest, res: Response, next: NextFunction) {
     const { name } = req.query;
     try {
       const conditions: any = {};
@@ -13,8 +19,12 @@ module.exports = {
           mode: "insensitive",
         };
       }
+
       const product = await products.findMany({
-        where: conditions,
+        where: {
+          userId: req.userData!.id,
+          ...conditions
+        },
       });
       res.status(200).json({
         success: true,
@@ -51,7 +61,7 @@ module.exports = {
     }
   },
 
-  async createProduct(req: Request, res: Response, next: NextFunction) {
+  async createProduct(req: AuthorizationRequest, res: Response, next: NextFunction) {
     const { name, price, description } = req.body;
     if (!name && !price && !description) {
       return res.status(400).json({
@@ -80,6 +90,7 @@ module.exports = {
             price,
             description,
             image: result.url,
+            userId: req.userData!.id
           },
         });
         res.status(201).json({
@@ -123,9 +134,7 @@ module.exports = {
           .split("/")
           .pop()
           .split(".")[0];
-        console.log("oldImagePublicId", oldImagePublicId);
         await cloudinary.uploader.destroy(`products-test/${oldImagePublicId}`);
-
         const product = await products.update({
           where: {
             id: productId,
@@ -174,12 +183,6 @@ module.exports = {
         data: product,
       });
     } catch (error: any) {
-      if (error.code === "P2025") {
-        return res.status(404).json({
-          success: false,
-          message: "Product not found",
-        });
-      }
       res.status(400).json({ success: false, message: error.message });
     }
   },
