@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthorizationRequest } from "../types";
-import { Prisma } from "@prisma/client";
 const { products } = require("../models/index");
 const cloudinary = require("../middlewares/cloudinary");
 const fs = require("fs");
@@ -46,18 +45,18 @@ module.exports = {
         },
       });
 
-      if (!product) {
-        return res.status(404).json({
-          success: false,
-          message: "Product not found",
-        });
-      }
       res.status(200).json({
         success: true,
         message: "Successfully to get detail product",
         data: product,
       });
     } catch (error: any) {
+      if (error.code === "P2025") {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
       res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -74,12 +73,6 @@ module.exports = {
         message: "everything is required",
       });
     }
-    // if (!req.file) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Image is required",
-    //   });
-    // }
     try {
       if (req.file) {
         const fileBase64 = req.file.buffer.toString("base64");
@@ -124,6 +117,7 @@ module.exports = {
       if (req.file) {
         const fileBase64 = req.file.buffer.toString("base64");
         const file = `data:${req.file.mimetype};base64,${fileBase64}`;
+
         // Upload new image to Cloudinary
         if (file) {
           const result = await cloudinary.uploader.upload(file, {

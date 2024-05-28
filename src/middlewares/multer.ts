@@ -2,7 +2,6 @@ import { Request } from "express";
 import { FileFilterCallback } from "multer";
 
 const multer = require("multer");
-const path = require("path");
 const storage = multer.memoryStorage();
 const maxSize = 1024 * 1024 * 20;
 
