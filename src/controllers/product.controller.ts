@@ -1,10 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthorizationRequest } from "../types";
+import { Prisma } from "@prisma/client";
 const { products } = require("../models/index");
 const cloudinary = require("../middlewares/cloudinary");
+const fs = require("fs");
 
 module.exports = {
-  async getListProduct(req: AuthorizationRequest, res: Response, next: NextFunction) {
+  async getListProduct(
+    req: AuthorizationRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     const { name } = req.query;
     try {
       const conditions: any = {};
@@ -18,7 +24,7 @@ module.exports = {
       const product = await products.findMany({
         where: {
           userId: req.userData!.id,
-          ...conditions
+          ...conditions,
         },
       });
       res.status(200).json({
@@ -56,7 +62,11 @@ module.exports = {
     }
   },
 
-  async createProduct(req: AuthorizationRequest, res: Response, next: NextFunction) {
+  async createProduct(
+    req: AuthorizationRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     const { name, price, description } = req.body;
     if (!name && !price && !description) {
       return res.status(400).json({
@@ -85,7 +95,7 @@ module.exports = {
             price,
             description,
             image: result.url,
-            userId: req.userData!.id
+            userId: req.userData!.id,
           },
         });
         res.status(201).json({
@@ -110,44 +120,56 @@ module.exports = {
         },
       });
 
-      if (!isProductExist) {
-        return res.status(404).json({
-          success: false,
-          message: "Product not found",
-        });
-      }
       let newImageUrl = isProductExist.image;
       if (req.file) {
         const fileBase64 = req.file.buffer.toString("base64");
         const file = `data:${req.file.mimetype};base64,${fileBase64}`;
-        const result = cloudinary.uploader.upload(file, {
-          folder: "products-test",
-        });
+        // Upload new image to Cloudinary
+        if (file) {
+          const result = await cloudinary.uploader.upload(file, {
+            folder: "products-test",
+            overwrite: true,
+          });
+          newImageUrl = result.secure_url;
+        } else {
+          const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: "products-test",
+            overwrite: true,
+          });
+          newImageUrl = result.secure_url;
+          fs.unlinkSync(req.file.path);
+        }
 
-        //Delete the old image to cloudinary
+        // Delete the old image from Cloudinary
         const oldImagePublicId = isProductExist.image
           .split("/")
           .pop()
           .split(".")[0];
         await cloudinary.uploader.destroy(`products-test/${oldImagePublicId}`);
-        const product = await products.update({
-          where: {
-            id: productId,
-          },
-          data: {
-            name,
-            description,
-            price,
-            image: result.secure_url,
-          },
-        });
-        res.status(200).json({
-          success: true,
-          message: "Successfully to update product",
-          data: product,
+      }
+
+      const updatedProduct = await products.update({
+        where: { id: productId },
+        data: {
+          name,
+          description,
+          price,
+          image: newImageUrl,
+        },
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Successfully updated product",
+        data: updatedProduct,
+      });
+    } catch (error: any) {
+      if (error.code === "P2025") {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
         });
       }
-    } catch (error: any) {
       res.status(400).json({ success: false, message: error.message });
     }
   },
@@ -161,23 +183,18 @@ module.exports = {
         },
       });
 
-      const isProductExist = await products.findUnique({
-        where: productId,
-      });
-
-      if (!isProductExist) {
-        return res.status(404).json({
-          success: false,
-          message: "Product not found",
-        });
-      }
-
       res.status(200).json({
         success: true,
         message: "Successfully to delete product",
         data: product,
       });
     } catch (error: any) {
+      if (error.code === "P2025") {
+        return res.status(404).json({
+          success: false,
+          message: "Product not found",
+        });
+      }
       res.status(400).json({ success: false, message: error.message });
     }
   },

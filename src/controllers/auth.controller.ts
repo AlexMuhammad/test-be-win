@@ -92,7 +92,7 @@ module.exports = {
       );
 
       if (!isPasswordCorrect) {
-        res.status(401).json({
+        return res.status(400).json({
           success: false,
           message: "Password wrong",
         });
@@ -105,6 +105,7 @@ module.exports = {
 
       res.status(201).json({
         success: true,
+        message: "Successfully login",
         data: {
           name: findUser.name,
         },
